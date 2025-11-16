@@ -1,7 +1,7 @@
 services:
   web:
     build:
-      context: ./web
+      context: .
       dockerfile: Dockerfile
     container_name: web
     env_file:
@@ -16,7 +16,7 @@ services:
 
   worker:
     build:
-      context: ./web
+      context: .
       dockerfile: Dockerfile
     container_name: worker
     env_file:
