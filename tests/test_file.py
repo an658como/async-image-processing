@@ -2,12 +2,12 @@ import magic, pytest
 from unittest.mock import patch
 
 from pydantic import ValidationError
-from web.app.file import UploadFile
+from web.app.file import FileUpload
 
 
 def test_upload_file_missing_required_fields():
     with pytest.raises(ValidationError) as exc:
-        UploadFile()
+        FileUpload()
 
     error_fields = {tuple(err["loc"]) for err in exc.value.errors()}
     assert ("file_name",) in error_fields
@@ -19,11 +19,11 @@ def test_upload_file_creation():
     file_data = b"Hello, World!"
     description = "Sample file"
 
-    upload_file = UploadFile(
+    upload_file = FileUpload(
         file_name=file_name, file_data=file_data, description=description
     )
 
-    assert isinstance(upload_file, UploadFile)
+    assert isinstance(upload_file, FileUpload)
     assert upload_file.file_name == file_name
     assert upload_file.file_data == file_data
     assert upload_file.description == description
@@ -37,7 +37,7 @@ def test_pdf_upload_file_creation():
     file_data = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
     description = "Sample PDF file"
 
-    upload_file = UploadFile(
+    upload_file = FileUpload(
         file_name=file_name, file_data=file_data, description=description
     )
 
@@ -51,7 +51,7 @@ def test_jpeg_upload_file_creation():
     file_data = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x02"
     description = "Sample JPEG file"
 
-    upload_file = UploadFile(
+    upload_file = FileUpload(
         file_name=file_name, file_data=file_data, description=description
     )
 
@@ -60,7 +60,7 @@ def test_jpeg_upload_file_creation():
 
 
 def test_empty_file_data_sets_mime_to_none():
-    f = UploadFile(file_name="empty.txt", file_data=b"")
+    f = FileUpload(file_name="empty.txt", file_data=b"")
     assert f.file_size == 0
     assert f.mime_type is None
 
@@ -69,5 +69,5 @@ def test_magic_exception_results_in_none():
     with patch(
         "web.app.file.magic.from_buffer", side_effect=magic.MagicException("fail")
     ):
-        f = UploadFile(file_name="x", file_data=b"123")
+        f = FileUpload(file_name="x", file_data=b"123")
         assert f.mime_type is None

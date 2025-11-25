@@ -6,7 +6,7 @@ from typing import Self
 from pydantic import BaseModel, Field, model_validator
 
 
-class UploadFile(BaseModel):
+class FileUpload(BaseModel):
     file_name: str
     create_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     file_size: int = 0
@@ -16,17 +16,21 @@ class UploadFile(BaseModel):
 
     @model_validator(mode="after")
     def calculate_file_size(self) -> Self:
-        self.file_size = len(self.file_data)
+        if not self.file_size:
+            print("calculate size")
+            self.file_size = len(self.file_data)
         return self
 
     @model_validator(mode="after")
     def find_file_mime_type(self) -> Self:
-        stream = BytesIO(self.file_data)
-        self.mime_type = get_mime_type_from_stream(stream)
+        if not self.mime_type:
+            print("find mime type")
+            stream = BytesIO(self.file_data)
+            self.mime_type = get_mime_type_from_stream(stream)
         return self
 
 
-def get_mime_type_from_stream(data_stream):
+def get_mime_type_from_stream(data_stream: BytesIO):
     """
     Determines the MIME type of a file from its data stream.
 
