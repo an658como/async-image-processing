@@ -2,8 +2,10 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./web/Dockerfile.dev
     container_name: web
+    volumes:
+      - ./web:/app/web
     env_file:
       - ./.env
     ports:
@@ -12,7 +14,6 @@ services:
       - postgres
       - rabbitmq
       - minio
-    command: [ "sh", "-c", "while true; do echo 'web container is running'; sleep 5; done" ]
 
   worker:
     build:
