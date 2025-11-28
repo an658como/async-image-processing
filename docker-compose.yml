@@ -38,6 +38,17 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin_password
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
   rabbitmq:
     image: rabbitmq:3.10-management
     container_name: rabbitmq
