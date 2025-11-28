@@ -1,4 +1,7 @@
 .vscode/
+**/.DS_Store
+
+web/app/temp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

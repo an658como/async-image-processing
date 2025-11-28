@@ -32,7 +32,7 @@ async def upload_file(file: UploadFile = File(...), description: Optional[str] =
         )
         with open(
             temp_local_path,
-            "w",
+            "wb",
         ) as f:
             f.write(file_upload.file_data)
         logger.info("File uploaded successfuly")
