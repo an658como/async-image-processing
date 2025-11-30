@@ -2,7 +2,7 @@ import magic, pytest
 from unittest.mock import patch
 
 from pydantic import ValidationError
-from web.app.file import FileUpload
+from web.app.models import FileUpload
 
 
 def test_upload_file_missing_required_fields():

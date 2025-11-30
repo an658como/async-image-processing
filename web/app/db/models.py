@@ -13,7 +13,7 @@ class Image(Base):
     filename = Column(Text, nullable=False)
     filesize = Column(Integer, nullable=False)
     description = Column(Text, nullable=True)
-    minio_key = Column(Text, nullable=True)  # will be filled later
+    storage_path = Column(Text, nullable=True)  # will be filled later
     status = Column(String(20), default="pending")
     created_at = Column(TIMESTAMP, default=datetime.now(timezone.utc))
     updated_at = Column(

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile
 
-from web.app.file import FileUpload
+from web.app.models import FileUpload
 import logging
 
 from web.app.routers.file_processing import file_router

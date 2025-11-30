@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, status
-from web.app.file import FileUpload
+from web.app.models import FileUpload
 from pathlib import Path
 from uuid import uuid4
 import logging
@@ -66,5 +66,7 @@ async def upload_file(
     db.add(image_record)
     db.commit()
     db.refresh(image_record)
+
+    # create a message and send it to the broker
 
     return {"upload": "successful", "path": temp_local_path}

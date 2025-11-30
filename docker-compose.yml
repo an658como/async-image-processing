@@ -32,14 +32,14 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DATABASE__USER}
+      POSTGRES_PASSWORD: ${DATABASE__PASSWORD}
+      POSTGRES_DB: ${DATABASE__NAME}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
   pgadmin:
-    image: dpage/pgadmin4:9.8
+    image: dpage/pgadmin4:latest
     container_name: pgadmin_container
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
@@ -53,8 +53,8 @@ services:
     image: rabbitmq:3.10-management
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_USER: ${MESSAGE_BROKER__USER}
+      RABBITMQ_DEFAULT_PASS: ${MESSAGE_BROKER__PASSWORD}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -63,8 +63,8 @@ services:
     image: minio/minio:latest
     container_name: minio
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO__ADMIN_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO__ADMIN_PASSWORD}
     ports:
       - "9000:9000"
       - "9001:9001"
