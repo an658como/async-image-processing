@@ -48,6 +48,8 @@ services:
       - "8080:80"
     depends_on:
       - postgres
+    volumes:
+      - "./pgadmin_data:/var/lib/pgadmin"
 
   rabbitmq:
     image: rabbitmq:3.10-management

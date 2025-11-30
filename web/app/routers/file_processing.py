@@ -11,8 +11,6 @@ from web.app.db.engine import engine
 from web.app.db.models import Image, Base
 
 SessionLocal = sessionmaker(bind=engine)
-# Create tables (for dev)
-Base.metadata.create_all(bind=engine)
 
 logging.basicConfig(level=logging.ERROR, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
