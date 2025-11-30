@@ -5,6 +5,15 @@ from pathlib import Path
 from uuid import uuid4
 import logging
 
+from sqlalchemy.orm import Session, sessionmaker
+
+from web.app.db.engine import engine
+from web.app.db.models import Image, Base
+
+SessionLocal = sessionmaker(bind=engine)
+# Create tables (for dev)
+Base.metadata.create_all(bind=engine)
+
 logging.basicConfig(level=logging.ERROR, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -15,7 +24,9 @@ upload_dir.mkdir(parents=True, exist_ok=True)
 
 
 @file_router.post("/upload")
-async def upload_file(file: UploadFile = File(...), description: Optional[str] = None):
+async def upload_file(
+    file: UploadFile = File(...), user_id: int = 1, description: Optional[str] = None
+):
 
     file_upload = FileUpload(
         file_name=file.filename,
@@ -42,5 +53,18 @@ async def upload_file(file: UploadFile = File(...), description: Optional[str] =
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to save the file",
         )
+
+    # Insert DB record
+    db: Session = SessionLocal()
+    image_record = Image(
+        user_id=user_id,
+        filename=file_upload.file_name,
+        filesize=file_upload.file_size,
+        description=file_upload.description,
+        status="pending",
+    )
+    db.add(image_record)
+    db.commit()
+    db.refresh(image_record)
 
     return {"upload": "successful", "path": temp_local_path}

@@ -5,8 +5,19 @@ import logging
 
 from web.app.routers.file_processing import file_router
 
+
+from sqlalchemy.orm import Session, sessionmaker
+
+from web.app.db.engine import engine
+from web.app.db.models import Base
+
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
+SessionLocal = sessionmaker(bind=engine)
+
+# Create tables (for dev)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(file_router)
