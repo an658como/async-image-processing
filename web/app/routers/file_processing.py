@@ -7,8 +7,8 @@ import logging
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from web.app.db.engine import engine
-from web.app.db.models import Image, Base
+from ..db.engine import engine
+from ..db.models import Image
 
 SessionLocal = sessionmaker(bind=engine)
 

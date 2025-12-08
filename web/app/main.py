@@ -7,21 +7,44 @@ import logging
 from web.app.routers.file_processing import file_router
 
 
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-from web.app.db.engine import engine
-from web.app.db.models import Base
+from .db.engine import engine
+from .db.models import Base
 
+from .settings import settings
+
+import boto3
+
+from .services.object_store import ObjectStore
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 SessionLocal = sessionmaker(bind=engine)
+
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=settings.minio.admin_user,
+    aws_secret_access_key=settings.minio.admin_password,
+    endpoint_url=settings.minio.endpoint,
+)
+
+object_store = ObjectStore(s3_client)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables (for dev)
     Base.metadata.create_all(bind=engine)
+
+    # get bucket names
+    bucket_names = object_store.bucket_names()
+
+    # create buckets
+    object_store.create_buckets(
+        bucket_names=settings.object_store.bucket_names.difference(bucket_names)
+    )
+
     yield
 
 
@@ -31,6 +54,7 @@ app.include_router(file_router)
 
 @app.get("/")
 def read_root():
+    print("Hello world!")
     return {"Service": "Running"}
 
 
