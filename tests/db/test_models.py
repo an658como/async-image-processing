@@ -1,6 +1,7 @@
 import pytest
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from sqlalchemy.orm import sessionmaker
+
 from web.app.db.engine import engine as engine
 from web.app.db.models import Base
 from web.app.settings import settings

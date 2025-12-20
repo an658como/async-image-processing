@@ -1,22 +1,17 @@
+import logging
 from contextlib import asynccontextmanager
+
+import boto3
 from fastapi import FastAPI, UploadFile
+from sqlalchemy.orm import sessionmaker
 
 from web.app.models import FileUpload
-import logging
-
 from web.app.routers.file_processing import file_router
-
-
-from sqlalchemy.orm import sessionmaker
 
 from .db.engine import engine
 from .db.models import Base
-
-from .settings import settings
-
-import boto3
-
 from .services.object_store import ObjectStore
+from .settings import settings
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)

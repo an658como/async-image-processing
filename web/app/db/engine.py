@@ -1,6 +1,8 @@
 from typing import Optional
-from sqlalchemy import create_engine
+
 import sqlalchemy
+from sqlalchemy import create_engine
+
 from web.app.settings import settings
 
 

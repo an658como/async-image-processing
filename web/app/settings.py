@@ -1,5 +1,5 @@
+from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, computed_field, SecretStr
 
 
 class Database(BaseModel):

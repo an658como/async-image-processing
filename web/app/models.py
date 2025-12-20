@@ -1,8 +1,8 @@
-import magic
-
-from io import BytesIO
 from datetime import datetime, timezone
+from io import BytesIO
 from typing import Self
+
+import magic
 from pydantic import BaseModel, Field, model_validator
 
 

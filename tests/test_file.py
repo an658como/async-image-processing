@@ -1,7 +1,9 @@
-import magic, pytest
 from unittest.mock import patch
 
+import magic
+import pytest
 from pydantic import ValidationError
+
 from web.app.models import FileUpload
 
 
