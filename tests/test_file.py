@@ -67,7 +67,7 @@ def test_empty_file_data_sets_mime_to_none():
 
 def test_magic_exception_results_in_none():
     with patch(
-        "web.app.file.magic.from_buffer", side_effect=magic.MagicException("fail")
+        "web.app.models.magic.from_buffer", side_effect=magic.MagicException("fail")
     ):
         f = FileUpload(file_name="x", file_data=b"123")
         assert f.mime_type is None

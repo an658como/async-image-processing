@@ -1,20 +1,31 @@
-from web.app.db.engine import engine
-from web.app.db.models import Base
+import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from web.app.db.engine import engine as engine
+from web.app.db.models import Base
+from web.app.settings import settings
 
-Session = sessionmaker(bind=engine)
+
+@pytest.fixture(scope="class")
+def db_engine():
+    eng = engine(
+        f"postgresql://{settings.database.user}:{settings.database.password.get_secret_value()}@localhost:{settings.database.port}/{settings.database.name}"
+    )
+    Base.metadata.create_all(eng)
+    yield eng
+    eng.dispose()
+
+
+@pytest.fixture
+def db_session(db_engine):
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+    yield session
+    session.rollback()
+    session.close()
 
 
 class TestImages:
-    def setup_class(self):
-        Base.metadata.create_all(engine)
-        self.session = Session()
-
-    def teardown_class(self):
-        self.session.rollback()
-        self.session.close()
-
-    def test_db_version(self):
-        response = self.session.execute(text("SELECT version();")).scalar()
+    def test_db_version(self, db_session):
+        response = db_session.execute(text("SELECT version();")).scalar()
         assert "PostgreSQL" in response

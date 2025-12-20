@@ -20,7 +20,9 @@ from .services.object_store import ObjectStore
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
-SessionLocal = sessionmaker(bind=engine)
+
+db_engine = engine()
+SessionLocal = sessionmaker(bind=db_engine)
 
 s3_client = boto3.client(
     "s3",
@@ -35,7 +37,7 @@ object_store = ObjectStore(s3_client)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables (for dev)
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=db_engine)
 
     # get bucket names
     bucket_names = object_store.bucket_names()

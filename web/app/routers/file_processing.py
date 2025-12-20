@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from ..db.engine import engine
 from ..db.models import Image
 
-SessionLocal = sessionmaker(bind=engine)
+SessionLocal = sessionmaker(bind=engine())
 
 logging.basicConfig(level=logging.ERROR, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
