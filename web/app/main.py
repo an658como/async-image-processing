@@ -16,7 +16,7 @@ from .settings import settings
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-db_engine = engine()
+db_engine = engine(settings.database.connection_string)
 SessionLocal = sessionmaker(bind=db_engine)
 
 s3_client = boto3.client(

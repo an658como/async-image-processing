@@ -4,14 +4,18 @@ from sqlalchemy.orm import sessionmaker
 
 from web.app.db.engine import engine as engine
 from web.app.db.models import Base
-from web.app.settings import settings
+from web.app.settings import Settings, settings
 
 
-@pytest.fixture(scope="class")
-def db_engine():
-    eng = engine(
-        f"postgresql://{settings.database.user}:{settings.database.password.get_secret_value()}@localhost:{settings.database.port}/{settings.database.name}"
-    )
+@pytest.fixture
+def test_settings() -> Settings:
+    settings.database.host = "localhost"
+    return settings
+
+
+@pytest.fixture()
+def db_engine(test_settings):
+    eng = engine(test_settings.database.connection_string)
     Base.metadata.create_all(eng)
     yield eng
     eng.dispose()
