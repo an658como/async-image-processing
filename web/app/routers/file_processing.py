@@ -10,6 +10,8 @@ from web.app.models import FileUpload
 
 from ..db.engine import engine
 from ..db.models import Image
+from ..services.object_store import cloud_client, get_object_store
+from ..settings import settings
 
 SessionLocal = sessionmaker(bind=engine())
 
@@ -18,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 file_router = APIRouter(prefix="/file")
 
-upload_dir = Path(__file__).parent.parent / "temp" / "uploads"
-upload_dir.mkdir(parents=True, exist_ok=True)
+object_store = get_object_store(settings.cloud_provider)(cloud_client(settings.minio))
 
 
 @file_router.post("/upload")
@@ -37,14 +38,12 @@ async def upload_file(
 
     # save file
     try:
-        temp_local_path = str(
-            upload_dir / f"{str(uuid4().hex)}-{file_upload.file_name}"
+        key = f"{str(uuid4().hex)}-{file_upload.file_name}"
+        object_store.upload_file(
+            bucket_name=settings.object_store.incoming,
+            key=key,
+            data=file_upload.file_data,
         )
-        with open(
-            temp_local_path,
-            "wb",
-        ) as f:
-            f.write(file_upload.file_data)
         logger.info("File uploaded successfuly")
     except Exception as e:
         logger.exception("Failed to upload File :(")
@@ -68,4 +67,4 @@ async def upload_file(
 
     # create a message and send it to the broker
 
-    return {"upload": "successful", "path": temp_local_path}
+    return {"upload": "successful"}

@@ -12,6 +12,8 @@ class ObjectStore(t.Protocol):
 
     def create_buckets(self, bucket_names: list[str]): ...
 
+    def upload_file(self, bucket_name: str, data: bytes, key: str): ...
+
 
 class S3ObjectStore:
     def __init__(self, client):
@@ -23,6 +25,9 @@ class S3ObjectStore:
     def create_buckets(self, bucket_names: list[str]):
         for bucket_name in bucket_names:
             self.client.create_bucket(Bucket=bucket_name)
+
+    def upload_file(self, bucket_name: str, data: bytes, key: str):
+        self.client.put_object(Bucket=bucket_name, Key=key, Body=data)
 
 
 def cloud_client(settings: ObjectStoreSettings) -> botocore.client.S3:
