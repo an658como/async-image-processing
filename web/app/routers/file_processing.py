@@ -27,43 +27,37 @@ object_store = get_object_store(settings.cloud_provider)(cloud_client(settings.m
 async def upload_file(
     file: UploadFile = File(...), user_id: int = 1, description: Optional[str] = None
 ):
-
-    file_upload = FileUpload(
-        file_name=file.filename,
-        file_data=await file.read(),
-        file_size=file.size,
-        mime_type=file.content_type,
-        description=description,
-    )
-
-    # save file
-    try:
-        key = f"{str(uuid4().hex)}-{file_upload.file_name}"
-        object_store.upload_file(
-            bucket_name=settings.object_store.incoming,
-            key=key,
-            data=file_upload.file_data,
-        )
-        logger.info("File uploaded successfuly")
-    except Exception as e:
-        logger.exception("Failed to upload File :(")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to save the file",
-        )
-
     # Insert DB record
     db: Session = SessionLocal()
     image_record = Image(
         user_id=user_id,
-        filename=file_upload.file_name,
-        filesize=file_upload.file_size,
-        description=file_upload.description,
+        filename=file.filename,
+        filesize=file.size,
+        description=description,
         status="pending",
     )
     db.add(image_record)
     db.commit()
     db.refresh(image_record)
+
+    # save file
+    try:
+        key = f"{str(uuid4().hex)}-{file.filename}"
+        object_store.upload_file(
+            bucket_name=settings.object_store.incoming,
+            key=key,
+            data=file.file,
+        )
+        logger.info("File uploaded successfuly")
+    except Exception as e:
+        db.rollback()
+        logger.exception("Failed to upload File :(")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save the file",
+        )
+    finally:
+        db.close()
 
     # create a message and send it to the broker
 

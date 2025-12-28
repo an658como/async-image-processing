@@ -11,15 +11,7 @@ class FileUpload(BaseModel):
     create_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     file_size: int = 0
     description: str | None = None
-    file_data: bytes
     mime_type: str = ""
-
-    @model_validator(mode="after")
-    def calculate_file_size(self) -> Self:
-        if not self.file_size:
-            print("calculate size")
-            self.file_size = len(self.file_data)
-        return self
 
     @model_validator(mode="after")
     def find_file_mime_type(self) -> Self:
