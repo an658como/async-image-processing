@@ -1,5 +1,9 @@
+from typing import Literal
+
 from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+type CloudProviders = Literal["aws"]
 
 
 class Database(BaseModel):
@@ -48,6 +52,7 @@ class Settings(BaseSettings):
     minio: Minio
     fastapi_port: str
     object_store: ObjectStore
+    cloud_provider: CloudProviders = "aws"
 
     model_config = SettingsConfigDict(
         env_file=[".env"], extra="ignore", env_nested_delimiter="__"
