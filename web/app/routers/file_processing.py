@@ -27,6 +27,8 @@ object_store = get_object_store(settings.cloud_provider)(cloud_client(settings.m
 async def upload_file(
     file: UploadFile = File(...), user_id: int = 1, description: Optional[str] = None
 ):
+    key = f"user_{user_id}/{str(uuid4().hex)}-{file.filename}"
+
     # Insert DB record
     db: Session = SessionLocal()
     image_record = Image(
@@ -35,6 +37,7 @@ async def upload_file(
         filesize=file.size,
         description=description,
         status="pending",
+        object_store_key=key,
     )
     db.add(image_record)
     db.commit()
@@ -42,7 +45,6 @@ async def upload_file(
 
     # save file
     try:
-        key = f"{str(uuid4().hex)}-{file.filename}"
         object_store.upload_file(
             bucket_name=settings.object_store.incoming,
             key=key,
