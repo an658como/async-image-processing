@@ -22,3 +22,4 @@ class Image(Base):
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc),
     )
+    object_store_key = Column(String(255), nullable=True)
