@@ -23,12 +23,6 @@ file_router = APIRouter(prefix="/file")
 object_store = get_object_store(settings.cloud_provider)(cloud_client(settings.minio))
 
 
-# message queue defintion
-connection = pika.BlockingConnection(pika.ConnectionParameters("host.docker.internal"))
-channel = connection.channel()
-channel.queue_declare(queue="incoming_image")
-
-
 @file_router.post("/upload")
 async def upload_file(
     file: UploadFile = File(...), user_id: int = 1, description: Optional[str] = None
@@ -64,6 +58,13 @@ async def upload_file(
             "key": key,
         }
 
+        # message queue defintion
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters("host.docker.internal")
+        )
+        channel = connection.channel()
+        channel.queue_declare(queue="incoming_image")
+
         # send a message to the queue
         channel.basic_publish(
             exchange="", routing_key="incoming_image", body=json.dumps(message).encode()
@@ -82,38 +83,3 @@ async def upload_file(
     # create a message and send it to the broker
 
     return {"upload": "successful"}
-
-
-# debug end-point - needs to be removed later
-@file_router.get("/debug/get-messages")
-def debug_get_messages(limit: int = 10):
-    """
-    DEBUG ONLY.
-    Reads up to `limit` messages from RabbitMQ and ACKs them.
-    Do NOT use in production.
-    """
-
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host="host.docker.internal")
-    )
-    channel = connection.channel()
-
-    messages = []
-
-    for _ in range(limit):
-        method_frame, header_frame, body = channel.basic_get(
-            queue="incoming_image",
-            auto_ack=True,  # IMPORTANT
-        )
-
-        if method_frame is None:
-            break
-
-        messages.append(body.decode())
-
-    connection.close()
-
-    return {
-        "count": len(messages),
-        "messages": messages,
-    }

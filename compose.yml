@@ -18,15 +18,16 @@ services:
   worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./worker/Dockerfile.dev
     container_name: worker
+    volumes:
+      - ./worker:/app/worker
     env_file:
       - ./.env
     depends_on:
       - postgres
       - rabbitmq
       - minio
-    command: [ "sh", "-c", "while true; do echo 'worker container is running'; sleep 5; done" ]
 
   postgres:
     image: postgres:15
